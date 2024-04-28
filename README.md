@@ -17,6 +17,13 @@ git clone https://github.com/SillyTavern/SillyTavern-EdgeTTS-Plugin
 
 3. Restart the SillyTavern server.
 
+## How to use
+
+1. Install the plugin.
+2. Open the TTS panel from the extensions menu.
+3. Pick "Edge" as a TTS source.
+4. Pick "Plugin" in the dropdown list below.
+
 ## How to build
 
 Clone the repository, then run `npm install`.
