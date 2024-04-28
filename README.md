@@ -1,16 +1,29 @@
-# Plugin-WebpackTemplate
+# SillyTavern Edge TTS Plugin
 
-Template repository for server plugins using TypeScript and Webpack.
+Server plugin to generate TTS voices using [MsEdgeTTS](https://www.npmjs.com/package/msedge-tts).
 
-## How to use
+Must have SillyTavern >=1.12.0 or the latest staging branch.
 
-1. Click "Use this template" on the GitHub page.
-2. Create a new repository and clone it to your local machine.
-3. Open the repository in your code editor and run `npm install`.
-4. Edit the `package.json` file.
-5. Write the source code in the `src` directory.
-6. When you're ready to test - run `npm run build`.
-7. A minimized bundle will appear in `dist`, ready to be plugged into SillyTavern.
+## How to install
 
-> [!TIP]
-> If you want to test your plugin live, clone the repo into the `/plugins` folder of your SillyTavern installation.
+1. Before you begin, make sure you set a config `enableServerPlugins` to `true` in the config.yaml file of SillyTavern.
+
+2. Open a terminal in your SillyTavern directory, then run the following:
+
+```bash
+cd plugins
+git clone https://github.com/SillyTavern/SillyTavern-EdgeTTS-Plugin
+```
+
+3. Restart the SillyTavern server.
+
+## How to build
+
+Clone the repository, then run `npm install`.
+
+```bash
+# Debug build
+npm run build:dev
+# Prod build
+npm run build
+```
