@@ -1,6 +1,8 @@
 import bodyParser from 'body-parser';
 import { Router } from 'express';
 import { Chalk } from 'chalk';
+import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
+import { Readable } from 'stream';
 
 interface PluginInfo {
     id: string;
@@ -15,7 +17,20 @@ interface Plugin {
 }
 
 const chalk = new Chalk();
-const MODULE_NAME = '[SillyTavern-Example-Plugin]';
+const MODULE_NAME = '[SillyTavern-EdgeTTS-Plugin]';
+
+async function getVoices() {
+    const tts = new MsEdgeTTS();
+    const voices = await tts.getVoices();
+    return voices;
+}
+
+async function getVoiceStream(text: string, voice: string): Promise<Readable> {
+    const tts = new MsEdgeTTS();
+    await tts.setMetadata(voice, OUTPUT_FORMAT.WEBM_24KHZ_16BIT_MONO_OPUS);
+    const stream = tts.toStream(text);
+    return stream;
+}
 
 /**
  * Initialize the plugin.
@@ -27,11 +42,24 @@ export async function init(router: Router): Promise<void> {
     router.post('/probe', (_req, res) => {
         return res.sendStatus(204);
     });
-    // Use body-parser to parse the request body
-    router.post('/ping', jsonParser, async (req, res) => {
+    router.get('/list', async (_req, res) => {
         try {
-            const { message } = req.body;
-            return res.json({ message: `Pong! ${message}` });
+            const voices = await getVoices();
+            return res.json(voices);
+        } catch (error) {
+            console.error(chalk.red(MODULE_NAME), 'Request failed', error);
+            return res.status(500).send('Internal Server Error');
+        }
+    });
+    router.post('/generate', jsonParser, async (req, res) => {
+        try {
+            const { text, voice } = req.body;
+            if (!text || !voice) {
+                return res.status(400).send('Bad Request');
+            }
+            const stream = await getVoiceStream(text, voice);
+            res.setHeader('Content-Type', 'audio/webm');
+            return stream.pipe(res);
         } catch (error) {
             console.error(chalk.red(MODULE_NAME), 'Request failed', error);
             return res.status(500).send('Internal Server Error');
@@ -46,9 +74,9 @@ export async function exit(): Promise<void> {
 }
 
 export const info: PluginInfo = {
-    id: 'example',
-    name: 'Example Plugin',
-    description: 'A simple example plugin for SillyTavern server.',
+    id: 'edge-tts',
+    name: 'EdgeTTS Provider',
+    description: 'EdgeTTS voice provider for SillyTavern TTS extension.',
 };
 
 const plugin: Plugin = {
