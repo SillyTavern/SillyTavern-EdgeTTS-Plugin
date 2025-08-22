@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { Chalk } from 'chalk';
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 import { Readable } from 'stream';
+import xmlEscape from 'xml-escape';
 
 interface PluginInfo {
     id: string;
@@ -28,8 +29,8 @@ async function getVoices() {
 async function getVoiceStream(text: string, voice: string): Promise<Readable> {
     const tts = new MsEdgeTTS();
     await tts.setMetadata(voice, OUTPUT_FORMAT.WEBM_24KHZ_16BIT_MONO_OPUS);
-    const stream = tts.toStream(text);
-    return stream;
+    const { audioStream } = tts.toStream(xmlEscape(text));
+    return audioStream;
 }
 
 /**
